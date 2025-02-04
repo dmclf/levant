@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"strconv"
@@ -20,6 +19,7 @@ import (
 	"github.com/Masterminds/sprig/v3"
 	spewLib "github.com/davecgh/go-spew/spew"
 	consul "github.com/hashicorp/consul/api"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -30,6 +30,7 @@ func funcMap(consulClient *consul.Client) template.FuncMap {
 		"consulKey":          consulKeyFunc(consulClient),
 		"consulKeyExists":    consulKeyExistsFunc(consulClient),
 		"consulKeyOrDefault": consulKeyOrDefaultFunc(consulClient),
+		"consulKeyPut":       consulKeyPut(consulClient),
 		"env":                envFunc(),
 		"fileContents":       fileContents(),
 		"loop":               loop,
@@ -105,7 +106,7 @@ func consulKeyFunc(consulClient *consul.Client) func(string) (string, error) {
 		}
 
 		if kv == nil {
-			return "", errors.New("Consul KV not found")
+			return "", errors.New("consul kv not found")
 		}
 
 		v := string(kv.Value[:])
@@ -164,6 +165,29 @@ func consulKeyOrDefaultFunc(consulClient *consul.Client) func(string, string) (s
 	}
 }
 
+func consulKeyPut(consulClient *consul.Client) func(string, string) (string, error) {
+	return func(s string, d string) (string, error) {
+		kv := consulClient.KV()
+
+		// PUT a new KV pair
+		p := &consul.KVPair{Key: s, Value: []byte(d)}
+
+		_, err := kv.Put(p, nil)
+		if err != nil {
+			panic(err)
+		}
+
+		// Lookup the pair
+		pair, _, err := kv.Get(s, nil)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("KV: %v %d\n", pair.Key, len(pair.Value))
+
+		return s, nil
+	}
+}
+
 func loop(ints ...int64) (<-chan int64, error) {
 	var start, stop int64
 	switch len(ints) {
@@ -205,7 +229,9 @@ func parseFloat(s string) (float64, error) {
 		return 0.0, nil
 	}
 
-	result, err := strconv.ParseFloat(s, 10)
+	// result, err := strconv.ParseFloat(s, 10)
+	// SA1030: 'bitSize' argument is invalid, must be either 32 or 64 (staticcheck)
+	result, err := strconv.ParseFloat(s, 32)
 	if err != nil {
 		return 0, err
 	}
@@ -298,7 +324,7 @@ func fileContents() func(string) (string, error) {
 		if s == "" {
 			return "", nil
 		}
-		contents, err := ioutil.ReadFile(s)
+		contents, err := os.ReadFile(s)
 		if err != nil {
 			return "", err
 		}

@@ -14,15 +14,15 @@ var (
 
 	// Version must conform to the format expected by
 	// github.com/hashicorp/go-version for tests to work.
-	Version = "0.3.4"
+	Version = "0.3.5"
 
 	// VersionPrerelease is the marker for the version. If this is ""
 	// (empty string) then it means that it is a final release. Otherwise, this
 	// is a pre-release such as "dev" (in development), "beta", "rc1", etc.
-	VersionPrerelease = "dev"
+	VersionPrerelease = "dmclf"
 
 	// VersionMetadata is metadata further describing the build type.
-	VersionMetadata = ""
+	VersionMetadata = "branched off hashicorp's unmaintained version"
 )
 
 // GetHumanVersion composes the parts of the version in a way that's suitable

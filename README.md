@@ -1,9 +1,18 @@
 # Levant
 
+Seems unmaintained by HashiCorp
+
+- as per date 2025-02-04
+  - last tag, v0.3.3, Oct 5 2023
+  - last release, V0.3.3, Oct 5 2023
+  - last commit, f972086, Aug 3 2024
+
 [![Build Status](https://circleci.com/gh/hashicorp/levant.svg?style=svg)](https://circleci.com/gh/hashicorp/levant) [![Discuss](https://img.shields.io/badge/discuss-nomad-00BC7F?style=flat)](https://discuss.hashicorp.com/c/nomad)
 
 Levant is an open source templating and deployment tool for [HashiCorp Nomad][] jobs that provides
 realtime feedback and detailed failure messages upon deployment issues.
+
+
 
 ## Features
 

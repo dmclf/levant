@@ -7,35 +7,35 @@ run:
   tests: true
 
 output:
-  format: colored-line-number
+  formats: colored-line-number
   print-issued-lines: true
   print-linter-name: true
 
 linters:
   enable:
-    - deadcode
     - errcheck
     - goimports
     - gofmt
-    - golint
+      #- revive
     - govet
     - ineffassign
     - misspell
-    - structcheck
     - unconvert
-    - varcheck
-    - interfacer
     - unparam
-    - depguard
+      # - depguard
     - goconst
     - gocyclo
-    - gosec
-    - maligned
+      # - gosec
     - prealloc
+    - staticcheck
   disable:
+    # - fieldalignment
+    # - structcheck
+    # - interfacer
+    # - varcheck
+    # - deadcode
     # - nakedret
     # - gosimple
-    # - staticcheck
     # - stylecheck
     # - unused
     # - dupl

@@ -4,7 +4,7 @@ default: lint test check-mod dev
 GIT_COMMIT := $(shell git rev-parse --short HEAD)
 GIT_DIRTY := $(if $(shell git status --porcelain),+CHANGES)
 
-GO_LDFLAGS := "$(GO_LDFLAGS) -X github.com/hashicorp/levant/version.GitCommit=$(GIT_COMMIT)$(GIT_DIRTY)"
+GO_LDFLAGS := "$(GO_LDFLAGS) -X github.com/dmclf/levant/version.GitCommit=$(GIT_COMMIT)$(GIT_DIRTY)"
 
 .PHONY: tools
 tools: ## Install the tools used to test and build
@@ -51,7 +51,7 @@ test: ## Test the source code
 .PHONY: acceptance-test
 acceptance-test: ## Run the Levant acceptance tests
 	@echo "==> Running $@..."
-	go test -timeout 300s github.com/hashicorp/levant/test -v
+	go test -timeout 300s github.com/dmclf/levant/test -v
 
 .PHONY: check
 check: tools lint check-mod ## Lint the source code and check other properties
@@ -97,3 +97,17 @@ ifneq (,$(wildcard version/version_ent.go))
 else
 	@$(CURDIR)/scripts/version.sh version/version.go version/version.go
 endif
+
+.PHONY: make.arm64amd64.debs
+make.arm64amd64.debs: ## Tries to make .deb files for ARM and X86
+	@echo "==> Building Levant..."
+	@CGO_ENABLED=0 \
+		GOOS=$(firstword $(subst _, ,$*)) \
+		GOARCH=amd64
+		go build -trimpath -ldflags $(GO_LDFLAGS) -tags "$(GO_TAGS)" -o "bin/levant.amd64"
+	@CGO_ENABLED=0 \
+		GOOS=$(firstword $(subst _, ,$*)) \
+		GOARCH=arm64
+		go build -trimpath -ldflags $(GO_LDFLAGS) -tags "$(GO_TAGS)" -o "bin/levant.arm64"
+	@scripts/make.debs.sh
+	@echo "==> Done"
