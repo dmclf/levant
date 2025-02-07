@@ -103,11 +103,11 @@ make.arm64amd64.debs: ## Tries to make .deb files for ARM and X86
 	@echo "==> Building Levant..."
 	@CGO_ENABLED=0 \
 		GOOS=$(firstword $(subst _, ,$*)) \
-		GOARCH=amd64
+		GOARCH=amd64 \
 		go build -trimpath -ldflags $(GO_LDFLAGS) -tags "$(GO_TAGS)" -o "bin/levant.amd64"
 	@CGO_ENABLED=0 \
 		GOOS=$(firstword $(subst _, ,$*)) \
-		GOARCH=arm64
+		GOARCH=arm64 \
 		go build -trimpath -ldflags $(GO_LDFLAGS) -tags "$(GO_TAGS)" -o "bin/levant.arm64"
 	@scripts/make.debs.sh
 	@echo "==> Done"
